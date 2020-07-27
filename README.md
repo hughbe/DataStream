@@ -1,3 +1,3 @@
 # DataStream
 
-A description of this package.
+Swift data stream that lets you read bytes.
