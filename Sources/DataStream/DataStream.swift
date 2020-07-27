@@ -66,8 +66,8 @@ public struct DataStream {
         if position + size > count {
             throw DataStreamError.noSpace(position: position, count: size)
         }
-        
-        let result = _data.withUnsafeBytes { $0.load(fromByteOffset: position, as: type) }
+
+        let result = _data.advanced(by: position).withUnsafeBytes { $0.load(fromByteOffset: 0, as: type) }
         position += size
         return result
     }
