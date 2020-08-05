@@ -13,28 +13,32 @@ public enum DataStreamError: Error {
 }
 
 public struct DataStream {
-    private let _data: Data
+    public let data: Data
     private var _offset: Int = 0
     
     public init(data: Data) {
-        _data = data
+        self.data = data
     }
     
     public var position: Int {
         get {
             return _offset
         } set {
-            precondition(newValue >= 0 && newValue <= _data.count)
+            precondition(newValue >= 0 && newValue <= data.count)
             _offset = newValue
         }
     }
     
     public var count: Int {
-        return _data.count
+        return data.count
     }
     
     public var remainingCount: Int {
         return count - position
+    }
+    
+    public var remainingData: Data {
+        return data[position...]
     }
     
     public mutating func readUInt8() throws -> UInt8 {
@@ -67,7 +71,7 @@ public struct DataStream {
             throw DataStreamError.noSpace(position: position, count: size)
         }
 
-        let result = _data.advanced(by: position).withUnsafeBytes { $0.load(fromByteOffset: 0, as: type) }
+        let result = data.advanced(by: position).withUnsafeBytes { $0.load(fromByteOffset: 0, as: type) }
         position += size
         return result
     }
@@ -76,7 +80,8 @@ public struct DataStream {
         if position + count > self.count {
             throw DataStreamError.noSpace(position: position, count: count)
         }
-        _data.copyBytes(to: pointer, from: position..<position + count)
+
+        data.copyBytes(to: pointer, from: position..<position + count)
         position += count
     }
 }
