@@ -1,9 +1,9 @@
 //
 //  DataExtensions.swift
-//  MsgViewer
+//
 //
 //  Created by Hugh Bellamy on 20/07/2020.
-//  Copyright © 2020 Hugh Bellamy. All rights reserved.
+//
 //
 
 import Foundation
@@ -41,20 +41,40 @@ public struct DataStream {
         return data[position...]
     }
     
-    public mutating func readUInt8() throws -> UInt8 {
-        return try read(type: UInt8.self)
+    public mutating func read<T>(endianess: Endianess = .systemDefault) throws -> T where T: FixedWidthInteger {
+        let value = try read(type: T.self)
+        switch endianess {
+        case .systemDefault:
+            return value
+        case .littleEndian:
+            return T(littleEndian: value)
+        case .bigEndian:
+            return T(bigEndian: value)
+        }
     }
     
-    public mutating func readUInt16() throws -> UInt16 {
-        return try read(type: UInt16.self)
+    public mutating func readFloat(endianess: Endianess = .systemDefault) throws -> Float {
+        let value = try read(type: Float.self)
+        switch endianess {
+        case .systemDefault:
+            return value
+        case .littleEndian:
+            return Float(bitPattern: value.bitPattern.littleEndian)
+        case .bigEndian:
+            return Float(bitPattern: value.bitPattern.bigEndian)
+        }
     }
     
-    public mutating func readUInt32() throws -> UInt32 {
-        return try read(type: UInt32.self)
-    }
-    
-    public mutating func readUInt64() throws -> UInt64 {
-        return try read(type: UInt64.self)
+    public mutating func readDouble(endianess: Endianess = .systemDefault) throws -> Double {
+        let value = try read(type: Double.self)
+        switch endianess {
+        case .systemDefault:
+            return value
+        case .littleEndian:
+            return Double(bitPattern: value.bitPattern.littleEndian)
+        case .bigEndian:
+            return Double(bitPattern: value.bitPattern.bigEndian)
+        }
     }
     
     public mutating func readBytes(count: Int) throws -> [UInt8] {
@@ -63,6 +83,11 @@ public struct DataStream {
             try copyBytes(to: $0, count: count)
         }
         return result
+    }
+
+    public mutating func readString(count: Int, encoding: String.Encoding) throws -> String? {
+        let bytes = try readBytes(count: count)
+        return String(bytes: bytes, encoding: encoding)
     }
     
     public mutating func read<T>(type: T.Type) throws -> T {

@@ -1,9 +1,8 @@
 //
 //  RangeReplaceableCollection+PadLeft.swift
-//  MsgViewer
 //
 //  Created by Hugh Bellamy on 24/07/2020.
-//  Copyright © 2020 Hugh Bellamy. All rights reserved.
+//
 //
 
 import Foundation
