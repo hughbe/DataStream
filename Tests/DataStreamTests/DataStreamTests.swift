@@ -2,7 +2,15 @@ import XCTest
 @testable import DataStream
 
 final class DataStreamTests: XCTestCase {
-    func testConstructor() {
+    func testConstructorUInt8Array() {
+        let buffer: [UInt8] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]
+        let stream = DataStream(buffer: buffer)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.count)
+        XCTAssertEqual(8, stream.remainingCount)
+    }
+
+    func testConstructorData() {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
         let stream = DataStream(data: data)
         XCTAssertEqual(0, stream.position)
@@ -571,7 +579,8 @@ final class DataStreamTests: XCTestCase {
     }
 
     static var allTests = [
-        ("testConstructor", testConstructor),
+        ("testConstructorUInt8Array", testConstructorUInt8Array),
+        ("testConstructorData", testConstructorData),
         ("testReadUInt8", testReadUInt8),
         ("testReadInt8", testReadInt8),
         ("testReadUInt16", testReadUInt16),

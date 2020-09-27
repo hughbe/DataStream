@@ -16,6 +16,10 @@ public struct DataStream {
     public let data: Data
     private var _offset: Int = 0
     
+    public init(buffer: [UInt8]) {
+        self.init(data: Data(buffer))
+    }
+    
     public init(data: Data) {
         self.data = data
     }
