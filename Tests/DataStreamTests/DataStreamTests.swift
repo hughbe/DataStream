@@ -577,6 +577,16 @@ final class DataStreamTests: XCTestCase {
         XCTAssertEqual(1, stream.remainingCount)
         XCTAssertEqual(0x07, try stream.read() as UInt8)
     }
+    
+    func testPerformance() throws {
+        let buffer = [UInt8](repeating: 123, count: 500_000)
+        measure(metrics: [XCTClockMetric(), XCTCPUMetric(), XCTMemoryMetric()]) {
+            var dataStream = DataStream(buffer: buffer)
+            for _ in 0..<buffer.count / 4 {
+                let _: UInt32 = try! dataStream.read(endianess: .littleEndian)
+            }
+        }
+    }
 
     static var allTests = [
         ("testConstructorUInt8Array", testConstructorUInt8Array),
@@ -595,6 +605,7 @@ final class DataStreamTests: XCTestCase {
         ("testReadBytes", testReadBytes),
         ("testRead", testRead),
         ("testCopyBytes", testCopyBytes),
-        ("textPosition", testPosition),
+        ("texsPosition", testPosition),
+        ("testPerformance", testPerformance)
     ]
 }

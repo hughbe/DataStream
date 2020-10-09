@@ -100,7 +100,7 @@ public struct DataStream {
             throw DataStreamError.noSpace(position: position, count: size)
         }
 
-        let result = data.advanced(by: position).withUnsafeBytes { $0.load(fromByteOffset: 0, as: type) }
+        let result = data.withUnsafeBytes { $0.load(fromByteOffset: position, as: type) }
         position += size
         return result
     }
