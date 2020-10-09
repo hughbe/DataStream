@@ -100,7 +100,9 @@ public struct DataStream {
             throw DataStreamError.noSpace(position: position, count: size)
         }
 
-        let result = data.advanced(by: position).withUnsafeBytes { $0.load(fromByteOffset: 0, as: type) }
+        let result = data.withUnsafeBytes {
+            return $0.baseAddress?.advanced(by: position).assumingMemoryBound(to: T.self).pointee
+        }!
         position += size
         return result
     }
