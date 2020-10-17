@@ -94,6 +94,36 @@ public struct DataStream {
         return String(bytes: bytes, encoding: encoding)
     }
     
+    public mutating func readUnicodeString(endianess: Endianess) throws -> String? {
+        let position = self.position
+        var count = 0
+        while (try read(endianess: endianess) as UInt16 != 0) {
+            count += 1
+        }
+        
+        let encoding: String.Encoding
+        switch endianess {
+        case .littleEndian:
+            encoding = .utf16LittleEndian
+        case .bigEndian:
+            encoding = .utf16BigEndian
+        case .systemDefault:
+            encoding = .utf16
+        }
+        return String(data: data[position...position + count * 2], encoding: encoding)
+    }
+
+    public mutating func readAsciiString() throws -> String? {
+        let position = self.position
+        var count = 0
+        while (try read() as UInt8 != 0) {
+            count += 1
+        }
+        
+        return String(data: data[position...position + count], encoding: .ascii)
+    }
+
+    
     public mutating func read<T>(type: T.Type) throws -> T {
         let size = MemoryLayout<T>.size
         if position + size > count {
