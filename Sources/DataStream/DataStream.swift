@@ -101,6 +101,10 @@ public struct DataStream {
             count += 1
         }
         
+        if count == 0 {
+            return ""
+        }
+        
         let encoding: String.Encoding
         switch endianess {
         case .littleEndian:
@@ -120,10 +124,13 @@ public struct DataStream {
             count += 1
         }
         
+        if count == 0 {
+            return ""
+        }
+        
         return String(data: data[position...position + count], encoding: .ascii)
     }
 
-    
     public mutating func read<T>(type: T.Type) throws -> T {
         let size = MemoryLayout<T>.size
         if position + size > count {
