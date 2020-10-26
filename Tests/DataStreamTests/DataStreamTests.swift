@@ -515,43 +515,246 @@ final class DataStreamTests: XCTestCase {
         XCTAssertThrowsError(try stream.read(type: MyStruct.self))
     }
     
+    func testPeekUInt8() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data: data)
+        XCTAssertEqual(0x00, try stream.peek() as UInt8)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        XCTAssertEqual(0x00, try stream.peek() as UInt8)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        stream.position = 8
+        XCTAssertThrowsError(try stream.peek() as UInt8)
+    }
+    
+    func testPeekInt8() throws {
+        let data = Data([0x00, 0x81, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data: data)
+        XCTAssertEqual(0x00, try stream.peek() as Int8)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        XCTAssertEqual(0x00, try stream.peek() as Int8)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        stream.position = 8
+        XCTAssertThrowsError(try stream.peek() as Int8)
+    }
+    
+    func testPeekUInt16() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data: data)
+        XCTAssertEqual(0x0100, try stream.peek() as UInt16)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        XCTAssertEqual(0x0100, try stream.peek() as UInt16)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+
+        stream.position = 8
+        XCTAssertThrowsError(try stream.peek() as UInt16)
+    }
+    
+    func testPeekInt16() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data: data)
+        XCTAssertEqual(0x0100, try stream.peek() as Int16)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        XCTAssertEqual(0x0100, try stream.peek() as Int16)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+
+        stream.position = 8
+        XCTAssertThrowsError(try stream.peek() as Int16)
+    }
+    
+    func testPeekUInt32() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data: data)
+        XCTAssertEqual(0x03020100, try stream.peek() as UInt32)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        XCTAssertEqual(0x03020100, try stream.peek() as UInt32)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        stream.position = 8
+        XCTAssertThrowsError(try stream.peek() as UInt32)
+    }
+    
+    func testPeekInt32() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data: data)
+        XCTAssertEqual(0x03020100, try stream.peek() as Int32)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        XCTAssertEqual(0x03020100, try stream.peek() as Int32)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        stream.position = 8
+        XCTAssertThrowsError(try stream.peek() as Int32)
+    }
+    
+    func testPeekUInt64() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data: data)
+        XCTAssertEqual(0x0706050403020100, try stream.peek() as UInt64)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+
+        XCTAssertEqual(0x0706050403020100, try stream.peek() as UInt64)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        stream.position = 8
+        XCTAssertThrowsError(try stream.peek() as UInt64)
+    }
+    
+    func testPeekInt64() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data: data)
+        XCTAssertEqual(0x0706050403020100, try stream.peek() as Int64)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+
+        XCTAssertEqual(0x0706050403020100, try stream.peek() as Int64)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        stream.position = 8
+        XCTAssertThrowsError(try stream.peek() as Int64)
+    }
+    
+    func testPeekFloat() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03])
+        var stream = DataStream(data: data)
+        XCTAssertEqual(3.8204714e-37, try stream.peekFloat() as Float)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(4, stream.remainingCount)
+        
+        stream.position = 3
+        XCTAssertThrowsError(try stream.peekFloat(endianess: .bigEndian) as Float)
+    }
+    
+    func testPeekDouble() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data: data)
+        XCTAssertEqual(7.949928895127363e-275, try stream.peekDouble() as Double)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+
+        XCTAssertEqual(7.949928895127363e-275, try stream.peekDouble() as Double)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+            
+        stream.position = 8
+        XCTAssertThrowsError(try stream.peekDouble() as Double)
+    }
+    
+    func testPeekBytes() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data: data)
+
+        XCTAssertEqual([], try stream.peekBytes(count: 0))
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+
+        XCTAssertEqual([0x00, 0x01, 0x02], try stream.peekBytes(count: 3))
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        XCTAssertEqual([0x00, 0x01, 0x02], try stream.peekBytes(count: 3))
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        stream.position = 8
+        XCTAssertThrowsError(try stream.peekBytes(count: 1))
+    }
+    
+    func testPeekString() throws {
+        let data = Data([0x41, 0x42, 0x43, 0x41, 0x00, 0x42, 0x00, 0x43, 0x00])
+        var stream = DataStream(data: data)
+        XCTAssertEqual("A", try stream.peekString(count: 1, encoding: .ascii))
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(9, stream.remainingCount)
+        
+        XCTAssertEqual("A", try stream.peekString(count: 1, encoding: .ascii))
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(9, stream.remainingCount)
+        
+        stream.position = 9
+        XCTAssertThrowsError(try stream.peekString(count: 1, encoding: .ascii))
+    }
+
+    func testPeek() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data: data)
+
+        let s1 = try stream.peek(type: MyStruct.self)
+        XCTAssertEqual(0x00, s1.field1)
+        XCTAssertEqual(0x01, s1.field2)
+        XCTAssertEqual(0x0302, s1.field3)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+
+        let s2 = try stream.peek(type: MyStruct.self)
+        XCTAssertEqual(0x00, s2.field1)
+        XCTAssertEqual(0x01, s2.field2)
+        XCTAssertEqual(0x0302, s2.field3)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        stream.position = 8
+        XCTAssertThrowsError(try stream.peek(type: MyStruct.self))
+    }
+    
     func testCopyBytes() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
         var stream = DataStream(data: data)
 
         var buffer = [UInt8](repeating: 0xFF, count: 10)
         try buffer.withUnsafeMutableBufferPointer {
-            try stream.copyBytes(to: $0, count: 0)
+            try stream.readBytes(to: $0, count: 0)
         }
         XCTAssertEqual([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF], buffer)
 
         try buffer.withUnsafeMutableBufferPointer {
-            try stream.copyBytes(to: $0, count: 3)
+            try stream.readBytes(to: $0, count: 3)
         }
         XCTAssertEqual([0x00, 0x01, 0x02, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF], buffer)
         
         try buffer.withUnsafeMutableBufferPointer {
-            try stream.copyBytes(to: $0, count: 3)
+            try stream.readBytes(to: $0, count: 3)
         }
         XCTAssertEqual([0x03, 0x04, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF], buffer)
         
         try buffer.withUnsafeMutableBufferPointer {
-            try stream.copyBytes(to: $0, count: 1)
+            try stream.readBytes(to: $0, count: 1)
         }
         XCTAssertEqual([0x06, 0x04, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF], buffer)
         
         try buffer.withUnsafeMutableBufferPointer {
-            try stream.copyBytes(to: $0, count: 1)
+            try stream.readBytes(to: $0, count: 1)
         }
         XCTAssertEqual([0x07, 0x04, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF], buffer)
         
         try buffer.withUnsafeMutableBufferPointer {
-            try stream.copyBytes(to: $0, count: 0)
+            try stream.readBytes(to: $0, count: 0)
         }
         XCTAssertEqual([0x07, 0x04, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF], buffer)
 
         XCTAssertThrowsError(try buffer.withUnsafeMutableBufferPointer {
-            try stream.copyBytes(to: $0, count: 1)
+            try stream.readBytes(to: $0, count: 1)
         })
     }
     
