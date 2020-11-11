@@ -69,6 +69,14 @@ public struct DataStream {
         }
     }
     
+    public mutating func readBits<T>(endianess: Endianess = .systemDefault) throws -> BitFieldReader<T> where T: FixedWidthInteger {
+        return BitFieldReader(rawValue: try read(endianess: endianess))
+    }
+    
+    public mutating func peekBits<T>(endianess: Endianess = .systemDefault) throws -> BitFieldReader<T> where T: FixedWidthInteger {
+        return BitFieldReader(rawValue: try peek(endianess: endianess))
+    }
+    
     public mutating func readFloat(endianess: Endianess = .systemDefault) throws -> Float {
         let value = try read(type: Float.self)
         switch endianess {

@@ -1,4 +1,5 @@
 import XCTest
+import BitField
 @testable import DataStream
 
 final class DataStreamTests: XCTestCase {
@@ -718,6 +719,16 @@ final class DataStreamTests: XCTestCase {
         XCTAssertThrowsError(try stream.peek(type: MyStruct.self))
     }
     
+    func testReadBits() throws {
+        let data = Data([0b10101010])
+        var stream = DataStream(data: data)
+        var reader: BitFieldReader<UInt8> = try stream.readBits(endianess: .littleEndian)
+        XCTAssertEqual(1, stream.position)
+        XCTAssertEqual(0, reader.position)
+        XCTAssertEqual(0b10101010, reader.rawValue)
+        XCTAssertEqual(0b10101010, reader.readBits(count: 8))
+    }
+    
     func testCopyBytes() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
         var stream = DataStream(data: data)
@@ -808,7 +819,8 @@ final class DataStreamTests: XCTestCase {
         ("testReadBytes", testReadBytes),
         ("testRead", testRead),
         ("testCopyBytes", testCopyBytes),
-        ("texsPosition", testPosition),
+        ("testReadBits", testReadBits),
+        ("testPosition", testPosition),
         ("testPerformance", testPerformance)
     ]
 }
