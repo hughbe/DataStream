@@ -253,6 +253,9 @@ public struct DataStream {
         if position + count > self.count {
             throw DataStreamError.noSpace(position: position, count: count)
         }
+        if count == 0 {
+            return
+        }
 
         data.copyBytes(to: pointer, from: position..<position + count)
         position += count
