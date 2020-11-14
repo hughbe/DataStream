@@ -171,7 +171,7 @@ public struct DataStream {
         case .systemDefault:
             encoding = .utf16
         }
-        return String(data: data[position...position + count * 2], encoding: encoding)
+        return String(data: data[data.startIndex + position...data.startIndex + position + count * 2], encoding: encoding)
     }
     
     public mutating func peekUnicodeString(endianess: Endianess) throws -> String? {
@@ -194,7 +194,7 @@ public struct DataStream {
         case .systemDefault:
             encoding = .utf16
         }
-        return String(data: data[position...position + count * 2], encoding: encoding)
+        return String(data: data[data.startIndex + position...data.startIndex + position + count * 2], encoding: encoding)
     }
 
     public mutating func readAsciiString() throws -> String? {
@@ -208,7 +208,7 @@ public struct DataStream {
             return ""
         }
         
-        return String(data: data[position...position + count], encoding: .ascii)
+        return String(data: data[data.startIndex + position...data.startIndex + position + count], encoding: .ascii)
     }
     
     public mutating func peekAsciiString() throws -> String? {
@@ -222,7 +222,7 @@ public struct DataStream {
             return ""
         }
         
-        return String(data: data[position...position + count], encoding: .ascii)
+        return String(data: data[data.startIndex + position...data.startIndex + position + count], encoding: .ascii)
     }
 
     public mutating func read<T>(type: T.Type) throws -> T {
@@ -257,7 +257,7 @@ public struct DataStream {
             return
         }
 
-        data.copyBytes(to: pointer, from: position..<position + count)
+        data.copyBytes(to: pointer, from: data.startIndex + position..<data.startIndex + position + count)
         position += count
     }
     
