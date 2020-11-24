@@ -6,7 +6,7 @@ final class RoundtripTests: XCTestCase {
         do {
             var outputStream = OutputDataStream()
             outputStream.write(1234 as UInt16, endianess: .bigEndian)
-            var stream = DataStream(data: outputStream.data)
+            var stream = DataStream(outputStream.data)
             XCTAssertEqual(1234, try stream.read(endianess: .bigEndian) as UInt16)
         }
     }
@@ -15,7 +15,7 @@ final class RoundtripTests: XCTestCase {
         do {
             var outputStream = OutputDataStream()
             outputStream.write(1234 as UInt32, endianess: .bigEndian)
-            var stream = DataStream(data: outputStream.data)
+            var stream = DataStream(outputStream.data)
             XCTAssertEqual(1234, try stream.read(endianess: .bigEndian) as UInt32)
         }
     }

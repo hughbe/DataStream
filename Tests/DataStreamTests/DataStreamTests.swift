@@ -5,23 +5,140 @@ import BitField
 final class DataStreamTests: XCTestCase {
     func testConstructorUInt8Array() {
         let buffer: [UInt8] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]
-        let stream = DataStream(buffer: buffer)
+        let stream = DataStream(buffer)
         XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(0, stream.startIndex)
         XCTAssertEqual(8, stream.count)
         XCTAssertEqual(8, stream.remainingCount)
+        XCTAssertEqualHex([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07], [UInt8](stream.remainingData))
+    }
+    
+    func testConstructorUInt8ArraySlice() {
+        do {
+            let buffer: [UInt8] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]
+            let stream = DataStream(buffer, startIndex: 0, count: 8)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(0, stream.startIndex)
+            XCTAssertEqual(8, stream.count)
+            XCTAssertEqual(8, stream.remainingCount)
+            XCTAssertEqualHex([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07], [UInt8](stream.remainingData))
+        }
+        do {
+            let buffer: [UInt8] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]
+            let stream = DataStream(buffer, startIndex: 0, count: 2)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(0, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(2, stream.remainingCount)
+            XCTAssertEqualHex([0x00, 0x01], [UInt8](stream.remainingData))
+        }
+        do {
+            let buffer: [UInt8] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]
+            let stream = DataStream(buffer, startIndex: 2, count: 3)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(2, stream.startIndex)
+            XCTAssertEqual(3, stream.count)
+            XCTAssertEqual(3, stream.remainingCount)
+            XCTAssertEqualHex([0x02, 0x03, 0x04], [UInt8](stream.remainingData))
+        }
+        do {
+            let buffer: [UInt8] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]
+            let stream = DataStream(buffer, startIndex: 4, count: 4)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(4, stream.startIndex)
+            XCTAssertEqual(4, stream.count)
+            XCTAssertEqual(4, stream.remainingCount)
+            XCTAssertEqualHex([0x04, 0x05, 0x06, 0x07], [UInt8](stream.remainingData))
+        }
+        do {
+            let buffer: [UInt8] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]
+            let stream = DataStream(buffer, startIndex: 8, count: 0)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(8, stream.startIndex)
+            XCTAssertEqual(0, stream.count)
+            XCTAssertEqual(0, stream.remainingCount)
+            XCTAssertEqualHex([], [UInt8](stream.remainingData))
+        }
+        do {
+            let buffer: [UInt8] = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]
+            let stream = DataStream(buffer, startIndex: 7, count: 1)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(7, stream.startIndex)
+            XCTAssertEqual(1, stream.count)
+            XCTAssertEqual(1, stream.remainingCount)
+        }
     }
 
     func testConstructorData() {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        let stream = DataStream(data: data)
+        let stream = DataStream(data)
         XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(0, stream.startIndex)
         XCTAssertEqual(8, stream.count)
         XCTAssertEqual(8, stream.remainingCount)
+        XCTAssertEqualHex([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07], [UInt8](stream.remainingData))
+    }
+    
+    func testConstructorDataSlice() {
+        do {
+            let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            let stream = DataStream(data, startIndex: 0, count: 8)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(0, stream.startIndex)
+            XCTAssertEqual(8, stream.count)
+            XCTAssertEqual(8, stream.remainingCount)
+            XCTAssertEqualHex([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07], [UInt8](stream.remainingData))
+        }
+        do {
+            let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            let stream = DataStream(data, startIndex: 0, count: 2)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(0, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(2, stream.remainingCount)
+            XCTAssertEqualHex([0x00, 0x01], [UInt8](stream.remainingData))
+        }
+        do {
+            let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            let stream = DataStream(data, startIndex: 2, count: 3)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(2, stream.startIndex)
+            XCTAssertEqual(3, stream.count)
+            XCTAssertEqual(3, stream.remainingCount)
+            XCTAssertEqualHex([0x02, 0x03, 0x04], [UInt8](stream.remainingData))
+        }
+        do {
+            let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            let stream = DataStream(data, startIndex: 4, count: 4)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(4, stream.startIndex)
+            XCTAssertEqual(4, stream.count)
+            XCTAssertEqual(4, stream.remainingCount)
+            XCTAssertEqualHex([0x04, 0x05, 0x06, 0x07], [UInt8](stream.remainingData))
+        }
+        do {
+            let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            let stream = DataStream(data, startIndex: 8, count: 0)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(8, stream.startIndex)
+            XCTAssertEqual(0, stream.count)
+            XCTAssertEqual(0, stream.remainingCount)
+            XCTAssertEqualHex([], [UInt8](stream.remainingData))
+        }
+        do {
+            let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            let stream = DataStream(data, startIndex: 7, count: 1)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(7, stream.startIndex)
+            XCTAssertEqual(1, stream.count)
+            XCTAssertEqual(1, stream.remainingCount)
+            XCTAssertEqualHex([0x07], [UInt8](stream.remainingData))
+        }
     }
     
     func testReadUInt8() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual(0x00, try stream.read() as UInt8)
         XCTAssertEqual(1, stream.position)
         XCTAssertEqual(7, stream.remainingCount)
@@ -59,7 +176,7 @@ final class DataStreamTests: XCTestCase {
     
     func testReadInt8() throws {
         let data = Data([0x00, 0x81, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual(0x00, try stream.read() as Int8)
         XCTAssertEqual(1, stream.position)
         XCTAssertEqual(7, stream.remainingCount)
@@ -98,7 +215,7 @@ final class DataStreamTests: XCTestCase {
     func testReadUInt16() throws {
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x0100, try stream.read() as UInt16)
             XCTAssertEqual(2, stream.position)
             XCTAssertEqual(6, stream.remainingCount)
@@ -119,7 +236,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x0001, try stream.read(endianess: .bigEndian) as UInt16)
             XCTAssertEqual(2, stream.position)
             XCTAssertEqual(6, stream.remainingCount)
@@ -140,7 +257,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x0100, try stream.read(endianess: .littleEndian) as UInt16)
             XCTAssertEqual(2, stream.position)
             XCTAssertEqual(6, stream.remainingCount)
@@ -164,7 +281,7 @@ final class DataStreamTests: XCTestCase {
     func testReadInt16() throws {
         do {
             let data = Data([0x00, 0x01, 0x02, 0x83, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x0100, try stream.read() as Int16)
             XCTAssertEqual(2, stream.position)
             XCTAssertEqual(6, stream.remainingCount)
@@ -185,7 +302,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x83, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x0001, try stream.read(endianess: .bigEndian) as Int16)
             XCTAssertEqual(2, stream.position)
             XCTAssertEqual(6, stream.remainingCount)
@@ -206,7 +323,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x83, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x0100, try stream.read(endianess: .littleEndian) as Int16)
             XCTAssertEqual(2, stream.position)
             XCTAssertEqual(6, stream.remainingCount)
@@ -230,7 +347,7 @@ final class DataStreamTests: XCTestCase {
     func testReadUInt32() throws {
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x03020100, try stream.read() as UInt32)
             XCTAssertEqual(4, stream.position)
             XCTAssertEqual(4, stream.remainingCount)
@@ -243,7 +360,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x00010203, try stream.read(endianess: .bigEndian) as UInt32)
             XCTAssertEqual(4, stream.position)
             XCTAssertEqual(4, stream.remainingCount)
@@ -256,7 +373,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x03020100, try stream.read(endianess: .littleEndian) as UInt32)
             XCTAssertEqual(4, stream.position)
             XCTAssertEqual(4, stream.remainingCount)
@@ -272,7 +389,7 @@ final class DataStreamTests: XCTestCase {
     func testReadInt32() throws {
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x87])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x03020100, try stream.read() as Int32)
             XCTAssertEqual(4, stream.position)
             XCTAssertEqual(4, stream.remainingCount)
@@ -285,7 +402,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x87])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x000010203, try stream.read(endianess: .bigEndian) as Int32)
             XCTAssertEqual(4, stream.position)
             XCTAssertEqual(4, stream.remainingCount)
@@ -298,7 +415,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x87])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x03020100, try stream.read(endianess: .littleEndian) as Int32)
             XCTAssertEqual(4, stream.position)
             XCTAssertEqual(4, stream.remainingCount)
@@ -314,7 +431,7 @@ final class DataStreamTests: XCTestCase {
     func testReadUInt64() throws {
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x0706050403020100, try stream.read() as UInt64)
             XCTAssertEqual(8, stream.position)
             XCTAssertEqual(0, stream.remainingCount)
@@ -323,7 +440,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x1020304050607, try stream.read(endianess: .bigEndian) as UInt64)
             XCTAssertEqual(8, stream.position)
             XCTAssertEqual(0, stream.remainingCount)
@@ -332,7 +449,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x0706050403020100, try stream.read(endianess: .littleEndian) as UInt64)
             XCTAssertEqual(8, stream.position)
             XCTAssertEqual(0, stream.remainingCount)
@@ -344,7 +461,7 @@ final class DataStreamTests: XCTestCase {
     func testReadInt64() throws {
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x80])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x0706050403020100, try stream.read() as Int64)
             XCTAssertEqual(8, stream.position)
             XCTAssertEqual(8, stream.remainingCount)
@@ -356,7 +473,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x80])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x01020304050607, try stream.read(endianess: .bigEndian) as Int64)
             XCTAssertEqual(8, stream.position)
             XCTAssertEqual(8, stream.remainingCount)
@@ -368,7 +485,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x80])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(0x0706050403020100, try stream.read(endianess: .littleEndian) as Int64)
             XCTAssertEqual(8, stream.position)
             XCTAssertEqual(8, stream.remainingCount)
@@ -383,7 +500,7 @@ final class DataStreamTests: XCTestCase {
     func testReadFloat() throws {
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(3.8204714e-37, try stream.readFloat() as Float)
             XCTAssertEqual(4, stream.position)
             XCTAssertEqual(0, stream.remainingCount)
@@ -392,7 +509,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(Float(bitPattern: 0x00010203), try stream.readFloat(endianess: .bigEndian) as Float)
             XCTAssertEqual(4, stream.position)
             XCTAssertEqual(0, stream.remainingCount)
@@ -401,7 +518,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(3.8204714e-37, try stream.readFloat(endianess: .littleEndian) as Float)
             XCTAssertEqual(4, stream.position)
             XCTAssertEqual(0, stream.remainingCount)
@@ -413,7 +530,7 @@ final class DataStreamTests: XCTestCase {
     func testReadDouble() throws {
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(7.949928895127363e-275, try stream.readDouble() as Double)
             XCTAssertEqual(8, stream.position)
             XCTAssertEqual(0, stream.remainingCount)
@@ -422,7 +539,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(Double(bitPattern: 0x01020304050607) as Double, try stream.readDouble(endianess: .bigEndian) as Double)
             XCTAssertEqual(8, stream.position)
             XCTAssertEqual(0, stream.remainingCount)
@@ -431,7 +548,7 @@ final class DataStreamTests: XCTestCase {
         }
         do {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-            var stream = DataStream(data: data)
+            var stream = DataStream(data)
             XCTAssertEqual(7.949928895127363e-275, try stream.readDouble())
             XCTAssertEqual(8, stream.position)
             XCTAssertEqual(0, stream.remainingCount)
@@ -442,7 +559,7 @@ final class DataStreamTests: XCTestCase {
     
     func testReadBytes() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
 
         XCTAssertEqual([], try stream.readBytes(count: 0))
         XCTAssertEqual(0, stream.position)
@@ -473,7 +590,7 @@ final class DataStreamTests: XCTestCase {
     
     func testReadString() throws {
         let data = Data([0x41, 0x42, 0x43, 0x41, 0x00, 0x42, 0x00, 0x43, 0x00])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual("A", try stream.readString(count: 1, encoding: .ascii))
         XCTAssertEqual(1, stream.position)
         XCTAssertEqual(8, stream.remainingCount)
@@ -489,6 +606,79 @@ final class DataStreamTests: XCTestCase {
         XCTAssertThrowsError(try stream.readString(count: 1, encoding: .ascii))
     }
     
+    func testReadAsciiString() throws {
+        let data = Data([0x41, 0x42, 0x43, 0x00, 0x44, 0x45, 0x46, 0x00])
+        var stream = DataStream(data)
+        XCTAssertEqual("ABC", try stream.readAsciiString())
+        XCTAssertEqual(4, stream.position)
+        XCTAssertEqual(4, stream.remainingCount)
+        
+        XCTAssertEqual("DEF", try stream.readAsciiString())
+        XCTAssertEqual(8, stream.position)
+        XCTAssertEqual(0, stream.remainingCount)
+        
+        XCTAssertThrowsError(try stream.readAsciiString())
+    }
+    
+    func testReadUnicodeString() throws {
+        do {
+            let data = Data([0x41, 0x00, 0x42, 0x00, 0x43, 0x00, 0x00, 0x00, 0x44, 0x00, 0x45, 0x00, 0x46, 0x00, 0x00, 0x00])
+            var stream = DataStream(data)
+            XCTAssertEqual("ABC", try stream.readUnicodeString(endianess: .littleEndian))
+            XCTAssertEqual(8, stream.position)
+            XCTAssertEqual(8, stream.remainingCount)
+            
+            XCTAssertEqual("DEF", try stream.readUnicodeString(endianess: .littleEndian))
+            XCTAssertEqual(16, stream.position)
+            XCTAssertEqual(0, stream.remainingCount)
+            
+            XCTAssertThrowsError(try stream.readUnicodeString(endianess: .littleEndian))
+        }
+        do {
+            let data = Data([0x00, 0x41, 0x00, 0x42, 0x00, 0x43, 0x00, 0x00, 0x00, 0x44, 0x00, 0x45, 0x00, 0x46, 0x00, 0x00])
+            var stream = DataStream(data)
+            XCTAssertEqual("ABC", try stream.readUnicodeString(endianess: .bigEndian))
+            XCTAssertEqual(8, stream.position)
+            XCTAssertEqual(8, stream.remainingCount)
+            
+            XCTAssertEqual("DEF", try stream.readUnicodeString(endianess: .bigEndian))
+            XCTAssertEqual(16, stream.position)
+            XCTAssertEqual(0, stream.remainingCount)
+            
+            XCTAssertThrowsError(try stream.readUnicodeString(endianess: .bigEndian))
+        }
+        do {
+            let data = Data([0x00, 0x41, 0x00, 0x42, 0x00, 0x43, 0x00, 0x00, 0x00, 0x44, 0x00, 0x45, 0x00, 0x46, 0x00, 0x00])
+            var stream = DataStream(data)
+            XCTAssertEqual("ABC", try stream.readUnicodeString(endianess: .systemDefault))
+            XCTAssertEqual(8, stream.position)
+            XCTAssertEqual(8, stream.remainingCount)
+            
+            XCTAssertEqual("DEF", try stream.readUnicodeString(endianess: .systemDefault))
+            XCTAssertEqual(16, stream.position)
+            XCTAssertEqual(0, stream.remainingCount)
+            
+            XCTAssertThrowsError(try stream.readUnicodeString(endianess: .systemDefault))
+        }
+        do {
+            let data = Data([0x00, 0x41, 0x00, 0x42, 0x00, 0x43, 0x00, 0x00, 0x00, 0x44, 0x00, 0x45, 0x00, 0x46, 0x00, 0x00])
+            var stream = DataStream(data)
+            XCTAssertEqual("ABC", try stream.readUnicodeString())
+            XCTAssertEqual(8, stream.position)
+            XCTAssertEqual(8, stream.remainingCount)
+            
+            XCTAssertEqual("DEF", try stream.readUnicodeString())
+            XCTAssertEqual(16, stream.position)
+            XCTAssertEqual(0, stream.remainingCount)
+            
+            XCTAssertThrowsError(try stream.readUnicodeString())
+        }
+    }
+    
+    struct SingleFieldStruct {
+        public var field: UInt8
+    }
+    
     struct MyStruct {
         public var field1: UInt8
         public var field2: UInt8
@@ -497,7 +687,7 @@ final class DataStreamTests: XCTestCase {
     
     func testRead() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
 
         let s1 = try stream.read(type: MyStruct.self)
         XCTAssertEqual(0x00, s1.field1)
@@ -518,7 +708,7 @@ final class DataStreamTests: XCTestCase {
     
     func testPeekUInt8() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual(0x00, try stream.peek() as UInt8)
         XCTAssertEqual(0, stream.position)
         XCTAssertEqual(8, stream.remainingCount)
@@ -533,7 +723,7 @@ final class DataStreamTests: XCTestCase {
     
     func testPeekInt8() throws {
         let data = Data([0x00, 0x81, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual(0x00, try stream.peek() as Int8)
         XCTAssertEqual(0, stream.position)
         XCTAssertEqual(8, stream.remainingCount)
@@ -548,7 +738,7 @@ final class DataStreamTests: XCTestCase {
     
     func testPeekUInt16() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual(0x0100, try stream.peek() as UInt16)
         XCTAssertEqual(0, stream.position)
         XCTAssertEqual(8, stream.remainingCount)
@@ -563,7 +753,7 @@ final class DataStreamTests: XCTestCase {
     
     func testPeekInt16() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual(0x0100, try stream.peek() as Int16)
         XCTAssertEqual(0, stream.position)
         XCTAssertEqual(8, stream.remainingCount)
@@ -578,7 +768,7 @@ final class DataStreamTests: XCTestCase {
     
     func testPeekUInt32() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual(0x03020100, try stream.peek() as UInt32)
         XCTAssertEqual(0, stream.position)
         XCTAssertEqual(8, stream.remainingCount)
@@ -593,7 +783,7 @@ final class DataStreamTests: XCTestCase {
     
     func testPeekInt32() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual(0x03020100, try stream.peek() as Int32)
         XCTAssertEqual(0, stream.position)
         XCTAssertEqual(8, stream.remainingCount)
@@ -608,7 +798,7 @@ final class DataStreamTests: XCTestCase {
     
     func testPeekUInt64() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual(0x0706050403020100, try stream.peek() as UInt64)
         XCTAssertEqual(0, stream.position)
         XCTAssertEqual(8, stream.remainingCount)
@@ -623,7 +813,7 @@ final class DataStreamTests: XCTestCase {
     
     func testPeekInt64() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual(0x0706050403020100, try stream.peek() as Int64)
         XCTAssertEqual(0, stream.position)
         XCTAssertEqual(8, stream.remainingCount)
@@ -638,7 +828,7 @@ final class DataStreamTests: XCTestCase {
     
     func testPeekFloat() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual(3.8204714e-37, try stream.peekFloat() as Float)
         XCTAssertEqual(0, stream.position)
         XCTAssertEqual(4, stream.remainingCount)
@@ -649,7 +839,7 @@ final class DataStreamTests: XCTestCase {
     
     func testPeekDouble() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual(7.949928895127363e-275, try stream.peekDouble() as Double)
         XCTAssertEqual(0, stream.position)
         XCTAssertEqual(8, stream.remainingCount)
@@ -664,7 +854,7 @@ final class DataStreamTests: XCTestCase {
     
     func testPeekBytes() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
 
         XCTAssertEqual([], try stream.peekBytes(count: 0))
         XCTAssertEqual(0, stream.position)
@@ -684,7 +874,7 @@ final class DataStreamTests: XCTestCase {
     
     func testPeekString() throws {
         let data = Data([0x41, 0x42, 0x43, 0x41, 0x00, 0x42, 0x00, 0x43, 0x00])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         XCTAssertEqual("A", try stream.peekString(count: 1, encoding: .ascii))
         XCTAssertEqual(0, stream.position)
         XCTAssertEqual(9, stream.remainingCount)
@@ -696,10 +886,89 @@ final class DataStreamTests: XCTestCase {
         stream.position = 9
         XCTAssertThrowsError(try stream.peekString(count: 1, encoding: .ascii))
     }
+    
+    func testPeekAsciiString() throws {
+        let data = Data([0x41, 0x42, 0x43, 0x00, 0x44, 0x45, 0x46, 0x00])
+        var stream = DataStream(data)
+        XCTAssertEqual("ABC", try stream.peekAsciiString())
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        stream.position = 4
+        XCTAssertEqual("DEF", try stream.peekAsciiString())
+        XCTAssertEqual(4, stream.position)
+        XCTAssertEqual(4, stream.remainingCount)
+        
+        stream.position = 8
+        XCTAssertThrowsError(try stream.peekAsciiString())
+    }
+    
+    func testPeekUnicodeString() throws {
+        do {
+            let data = Data([0x41, 0x00, 0x42, 0x00, 0x43, 0x00, 0x00, 0x00, 0x44, 0x00, 0x45, 0x00, 0x46, 0x00, 0x00, 0x00])
+            var stream = DataStream(data)
+            XCTAssertEqual("ABC", try stream.peekUnicodeString(endianess: .littleEndian))
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(16, stream.remainingCount)
+            
+            stream.position = 8
+            XCTAssertEqual("DEF", try stream.peekUnicodeString(endianess: .littleEndian))
+            XCTAssertEqual(8, stream.position)
+            XCTAssertEqual(8, stream.remainingCount)
+            
+            stream.position = 16
+            XCTAssertThrowsError(try stream.peekUnicodeString(endianess: .littleEndian))
+        }
+        do {
+            let data = Data([0x00, 0x41, 0x00, 0x42, 0x00, 0x43, 0x00, 0x00, 0x00, 0x44, 0x00, 0x45, 0x00, 0x46, 0x00, 0x00])
+            var stream = DataStream(data)
+            XCTAssertEqual("ABC", try stream.peekUnicodeString(endianess: .bigEndian))
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(16, stream.remainingCount)
+            
+            stream.position = 8
+            XCTAssertEqual("DEF", try stream.peekUnicodeString(endianess: .bigEndian))
+            XCTAssertEqual(8, stream.position)
+            XCTAssertEqual(8, stream.remainingCount)
+            
+            stream.position = 16
+            XCTAssertThrowsError(try stream.peekUnicodeString(endianess: .bigEndian))
+        }
+        do {
+            let data = Data([0x00, 0x41, 0x00, 0x42, 0x00, 0x43, 0x00, 0x00, 0x00, 0x44, 0x00, 0x45, 0x00, 0x46, 0x00, 0x00])
+            var stream = DataStream(data)
+            XCTAssertEqual("ABC", try stream.peekUnicodeString(endianess: .systemDefault))
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(16, stream.remainingCount)
+            
+            stream.position = 8
+            XCTAssertEqual("DEF", try stream.peekUnicodeString(endianess: .systemDefault))
+            XCTAssertEqual(8, stream.position)
+            XCTAssertEqual(8, stream.remainingCount)
+            
+            stream.position = 16
+            XCTAssertThrowsError(try stream.readUnicodeString(endianess: .systemDefault))
+        }
+        do {
+            let data = Data([0x00, 0x41, 0x00, 0x42, 0x00, 0x43, 0x00, 0x00, 0x00, 0x44, 0x00, 0x45, 0x00, 0x46, 0x00, 0x00])
+            var stream = DataStream(data)
+            XCTAssertEqual("ABC", try stream.peekUnicodeString())
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(16, stream.remainingCount)
+            
+            stream.position = 8
+            XCTAssertEqual("DEF", try stream.peekUnicodeString())
+            XCTAssertEqual(8, stream.position)
+            XCTAssertEqual(8, stream.remainingCount)
+            
+            stream.position = 16
+            XCTAssertThrowsError(try stream.peekUnicodeString())
+        }
+    }
 
     func testPeek() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
 
         let s1 = try stream.peek(type: MyStruct.self)
         XCTAssertEqual(0x00, s1.field1)
@@ -721,7 +990,7 @@ final class DataStreamTests: XCTestCase {
     
     func testReadBits() throws {
         let data = Data([0b10101010])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         var reader: BitFieldReader<UInt8> = try stream.readBits(endianess: .littleEndian)
         XCTAssertEqual(1, stream.position)
         XCTAssertEqual(0, reader.position)
@@ -729,9 +998,142 @@ final class DataStreamTests: XCTestCase {
         XCTAssertEqual(0b10101010, reader.readBits(count: 8))
     }
     
+    func testReadSlice() throws {
+        do {
+            let buffer: [UInt8] = [0x12, 0x34, 0x56, 0x78, 0x90]
+            var stream = DataStream(buffer, startIndex: 1, count: 2)
+            XCTAssertEqual(0x34, try stream.read() as UInt8)
+            XCTAssertEqual(1, stream.position)
+            XCTAssertEqual(1, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(1, stream.remainingCount)
+            
+            XCTAssertEqual(0x56, try stream.read() as UInt8)
+            XCTAssertEqual(2, stream.position)
+            XCTAssertEqual(1, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(0, stream.remainingCount)
+            
+            XCTAssertThrowsError(try stream.read() as UInt8)
+        }
+        do {
+            let buffer: [UInt8] = [0x12, 0x34, 0x56, 0x78, 0x90]
+            var stream = DataStream(buffer, startIndex: 1, count: 2)
+            XCTAssertEqual(0x34, try stream.read(type: SingleFieldStruct.self).field)
+            XCTAssertEqual(1, stream.position)
+            XCTAssertEqual(1, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(1, stream.remainingCount)
+            
+            XCTAssertEqual(0x56, try stream.read(type: SingleFieldStruct.self).field)
+            XCTAssertEqual(2, stream.position)
+            XCTAssertEqual(1, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(0, stream.remainingCount)
+            
+            XCTAssertThrowsError(try stream.read(type: SingleFieldStruct.self).field)
+        }
+        do {
+            let buffer: [UInt8] = [0x12, 0x34, 0x56, 0x78, 0x90]
+            var stream = DataStream(buffer, startIndex: 1, count: 2)
+            XCTAssertEqual([0x34], try stream.readBytes(count: 1))
+            XCTAssertEqual(1, stream.position)
+            XCTAssertEqual(1, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(1, stream.remainingCount)
+            
+            XCTAssertEqual([0x56], try stream.readBytes(count: 1))
+            XCTAssertEqual(2, stream.position)
+            XCTAssertEqual(1, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(0, stream.remainingCount)
+            
+            XCTAssertThrowsError(try stream.readBytes(count: 1))
+        }
+        do {
+            let buffer: [UInt8] = [0x12, 0x41, 0x42, 0x78, 0x90]
+            var stream = DataStream(buffer, startIndex: 1, count: 2)
+            XCTAssertEqual("A", try stream.readString(count: 1, encoding: .ascii))
+            XCTAssertEqual(1, stream.position)
+            XCTAssertEqual(1, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(1, stream.remainingCount)
+            
+            XCTAssertEqual("B", try stream.readString(count: 1, encoding: .ascii)!)
+            XCTAssertEqual(2, stream.position)
+            XCTAssertEqual(1, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(0, stream.remainingCount)
+            
+            XCTAssertThrowsError(try stream.readString(count: 1, encoding: .ascii))
+        }
+        do {
+            let buffer: [UInt8] = [0x12, 0x41, 0x00, 0x78, 0x90]
+            var stream = DataStream(buffer, startIndex: 1, count: 2)
+            XCTAssertEqual("A", try stream.readAsciiString()!)
+            XCTAssertEqual(2, stream.position)
+            XCTAssertEqual(1, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(0, stream.remainingCount)
+            
+            XCTAssertThrowsError(try stream.readAsciiString())
+        }
+    }
+    
+    func testPeekSlice() throws {
+        do {
+            let buffer: [UInt8] = [0x12, 0x34, 0x56, 0x78, 0x90]
+            var stream = DataStream(buffer, startIndex: 1, count: 2)
+            XCTAssertEqual(0x34, try stream.peek() as UInt8)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(1, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(2, stream.remainingCount)
+            
+            stream.position = 2
+            XCTAssertThrowsError(try stream.peek() as UInt8)
+        }
+        do {
+            let buffer: [UInt8] = [0x12, 0x34, 0x56, 0x78, 0x90]
+            var stream = DataStream(buffer, startIndex: 1, count: 2)
+            XCTAssertEqual(0x34, try stream.peek(type: SingleFieldStruct.self).field as UInt8)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(1, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(2, stream.remainingCount)
+            
+            stream.position = 2
+            XCTAssertThrowsError(try stream.peek(type: SingleFieldStruct.self))
+        }
+        do {
+            let buffer: [UInt8] = [0x12, 0x34, 0x56, 0x78, 0x90]
+            var stream = DataStream(buffer, startIndex: 1, count: 2)
+            XCTAssertEqual([0x34], try stream.peekBytes(count: 1))
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(1, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(2, stream.remainingCount)
+            
+            stream.position = 2
+            XCTAssertThrowsError(try stream.peekBytes(count: 1))
+        }
+        do {
+            let buffer: [UInt8] = [0x12, 0x41, 0x42, 0x78, 0x90]
+            var stream = DataStream(buffer, startIndex: 1, count: 2)
+            XCTAssertEqual("A", try stream.peekString(count: 1, encoding: .ascii))
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(1, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(2, stream.remainingCount)
+            
+            stream.position = 2
+            XCTAssertThrowsError(try stream.peekString(count: 1, encoding: .ascii))
+        }
+    }
+    
     func testCopyBytes() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
 
         var buffer = [UInt8](repeating: 0xFF, count: 10)
         try buffer.withUnsafeMutableBufferPointer {
@@ -771,7 +1173,7 @@ final class DataStreamTests: XCTestCase {
     
     func testPosition() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
-        var stream = DataStream(data: data)
+        var stream = DataStream(data)
         
         // Set middle.
         stream.position = 1
@@ -795,7 +1197,7 @@ final class DataStreamTests: XCTestCase {
     func testPerformance() throws {
         let buffer = [UInt8](repeating: 123, count: 500_000)
         measure(metrics: [XCTClockMetric(), XCTCPUMetric(), XCTMemoryMetric()]) {
-            var dataStream = DataStream(buffer: buffer)
+            var dataStream = DataStream(buffer)
             for _ in 0..<buffer.count / 4 {
                 let _: UInt32 = try! dataStream.read(endianess: .littleEndian)
             }
@@ -804,6 +1206,7 @@ final class DataStreamTests: XCTestCase {
 
     static var allTests = [
         ("testConstructorUInt8Array", testConstructorUInt8Array),
+        ("testConstructorUInt8ArraySlice", testConstructorUInt8ArraySlice),
         ("testConstructorData", testConstructorData),
         ("testReadUInt8", testReadUInt8),
         ("testReadInt8", testReadInt8),
@@ -816,10 +1219,16 @@ final class DataStreamTests: XCTestCase {
         ("testReadFloat", testReadFloat),
         ("testReadDouble", testReadDouble),
         ("testReadString", testReadString),
+        ("testReadAsciiString", testReadAsciiString),
+        ("testReadUnicodeString", testReadUnicodeString),
         ("testReadBytes", testReadBytes),
         ("testRead", testRead),
+        ("testPeekString", testPeekString),
+        ("testPeekAsciiString", testPeekAsciiString),
+        ("testPeekUnicodeString", testPeekUnicodeString),
         ("testCopyBytes", testCopyBytes),
         ("testReadBits", testReadBits),
+        ("testReadSlice", testReadSlice),
         ("testPosition", testPosition),
         ("testPerformance", testPerformance)
     ]

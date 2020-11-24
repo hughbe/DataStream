@@ -13,37 +13,44 @@ public enum DataStreamError: Error {
 }
 
 public struct DataStream {
-    public let data: Data
-    private var _offset: Int = 0
+    private let data: Data
+    public let startIndex: Int
+    public let count: Int
+    private var _actualPosition: Int
     
-    public init(buffer: [UInt8]) {
-        self.init(data: Data(buffer))
+    public init(_ buffer: [UInt8]) {
+        self.init(Data(buffer))
     }
     
-    public init(data: Data) {
+    public init(_ data: [UInt8], startIndex: Int, count: Int) {
+        self.init(Data(data), startIndex: startIndex, count: count)
+    }
+    
+    public init(_ data: Data) {
+        self.init(data, startIndex: 0, count: data.count)
+    }
+    
+    public init(_ data: Data, startIndex: Int, count: Int) {
+        precondition(startIndex >= 0)
+        precondition(count >= 0)
+        precondition(startIndex <= data.count - count)
+        
+        self.startIndex = startIndex
+        self.count = count
         self.data = data
+        self._actualPosition = startIndex
     }
     
     public var position: Int {
-        get {
-            return _offset
-        } set {
-            precondition(newValue >= 0 && newValue <= data.count)
-            _offset = newValue
+        get {  _actualPosition - startIndex } set {
+            precondition(newValue >= 0 && newValue <= count)
+            _actualPosition = newValue + startIndex
         }
     }
     
-    public var count: Int {
-        return data.count
-    }
+    public var remainingCount: Int { count - position }
     
-    public var remainingCount: Int {
-        return count - position
-    }
-    
-    public var remainingData: Data {
-        return data[position...]
-    }
+    public var remainingData: Data { data[_actualPosition..<(_actualPosition + count)] }
     
     public mutating func read<T>(endianess: Endianess = .systemDefault) throws -> T where T: FixedWidthInteger {
         let value = try read(type: T.self)
@@ -151,8 +158,8 @@ public struct DataStream {
         return String(bytes: bytes, encoding: encoding)
     }
     
-    public mutating func readUnicodeString(endianess: Endianess) throws -> String? {
-        let position = self.position
+    public mutating func readUnicodeString(endianess: Endianess = .systemDefault) throws -> String? {
+        let position = _actualPosition
         var count = 0
         while (try read(endianess: endianess) as UInt16 != 0) {
             count += 1
@@ -171,34 +178,19 @@ public struct DataStream {
         case .systemDefault:
             encoding = .utf16
         }
-        return String(data: data[data.startIndex + position...data.startIndex + position + count * 2], encoding: encoding)
+
+        return String(data: data[data.startIndex + position..<data.startIndex + position + count * 2], encoding: encoding)
     }
     
-    public mutating func peekUnicodeString(endianess: Endianess) throws -> String? {
+    public mutating func peekUnicodeString(endianess: Endianess = .systemDefault) throws -> String? {
         let position = self.position
-        var count = 0
-        while (try peek(endianess: endianess) as UInt16 != 0) {
-            count += 1
-        }
-        
-        if count == 0 {
-            return ""
-        }
-        
-        let encoding: String.Encoding
-        switch endianess {
-        case .littleEndian:
-            encoding = .utf16LittleEndian
-        case .bigEndian:
-            encoding = .utf16BigEndian
-        case .systemDefault:
-            encoding = .utf16
-        }
-        return String(data: data[data.startIndex + position...data.startIndex + position + count * 2], encoding: encoding)
+        let result = try readUnicodeString(endianess: endianess)
+        self.position = position
+        return result
     }
 
     public mutating func readAsciiString() throws -> String? {
-        let position = self.position
+        let position = _actualPosition
         var count = 0
         while (try read() as UInt8 != 0) {
             count += 1
@@ -208,64 +200,46 @@ public struct DataStream {
             return ""
         }
         
-        return String(data: data[data.startIndex + position...data.startIndex + position + count], encoding: .ascii)
+        return String(data: data[data.startIndex + position..<data.startIndex + position + count], encoding: .ascii)
     }
     
     public mutating func peekAsciiString() throws -> String? {
         let position = self.position
-        var count = 0
-        while (try peek() as UInt8 != 0) {
-            count += 1
-        }
-        
-        if count == 0 {
-            return ""
-        }
-        
-        return String(data: data[data.startIndex + position...data.startIndex + position + count], encoding: .ascii)
+        let result = try readAsciiString()
+        self.position = position
+        return result
     }
 
     public mutating func read<T>(type: T.Type) throws -> T {
-        let size = MemoryLayout<T>.size
-        if position + size > count {
-            throw DataStreamError.noSpace(position: position, count: size)
-        }
-
-        let result = data.withUnsafeBytes {
-            return $0.baseAddress?.advanced(by: position).assumingMemoryBound(to: T.self).pointee
-        }!
-        position += size
+        let result = try peek(type: type)
+        position += MemoryLayout<T>.size
         return result
     }
     
     public mutating func peek<T>(type: T.Type) throws -> T {
         let size = MemoryLayout<T>.size
-        if position + size > count {
+        if _actualPosition + size > startIndex + count {
             throw DataStreamError.noSpace(position: position, count: size)
         }
 
         return data.withUnsafeBytes {
-            return $0.baseAddress?.advanced(by: position).assumingMemoryBound(to: T.self).pointee
+            return $0.baseAddress?.advanced(by: _actualPosition).assumingMemoryBound(to: T.self).pointee
         }!
     }
     
     public mutating func readBytes(to pointer: UnsafeMutableBufferPointer<UInt8>, count: Int) throws {
-        if position + count > self.count {
+        try peekBytes(to: pointer, count: count)
+        position += count
+    }
+    
+    public mutating func peekBytes(to pointer: UnsafeMutableBufferPointer<UInt8>, count: Int) throws {
+        if _actualPosition + count > startIndex + self.count {
             throw DataStreamError.noSpace(position: position, count: count)
         }
         if count == 0 {
             return
         }
 
-        data.copyBytes(to: pointer, from: data.startIndex + position..<data.startIndex + position + count)
-        position += count
-    }
-    
-    public mutating func peekBytes(to pointer: UnsafeMutableBufferPointer<UInt8>, count: Int) throws {
-        if position + count > self.count {
-            throw DataStreamError.noSpace(position: position, count: count)
-        }
-
-        data.copyBytes(to: pointer, from: position..<position + count)
+        data.copyBytes(to: pointer, from: data.startIndex + _actualPosition..<data.startIndex + _actualPosition + count)
     }
 }
