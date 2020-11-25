@@ -26,6 +26,17 @@ public struct DataStream {
         self.init(Data(data), startIndex: startIndex, count: count)
     }
     
+    public init(slicing dataStream: DataStream, startIndex: Int, count: Int) {
+        precondition(startIndex >= 0)
+        precondition(count >= 0)
+        precondition(startIndex <= dataStream.count - count)
+        
+        self.startIndex = startIndex
+        self.count = count
+        self.data = dataStream.data
+        self._actualPosition = startIndex
+    }
+    
     public init(_ data: Data) {
         self.init(data, startIndex: 0, count: data.count)
     }
