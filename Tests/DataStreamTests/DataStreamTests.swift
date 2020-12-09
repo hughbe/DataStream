@@ -201,12 +201,14 @@ final class DataStreamTests: XCTestCase {
             let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
             let original = DataStream(data)
             let slice = DataStream(slicing: original, startIndex: 2, count: 4)
-            let stream = DataStream(slicing: slice, startIndex: 1, count: 2)
+            var stream = DataStream(slicing: slice, startIndex: 1, count: 2)
             XCTAssertEqual(0, stream.position)
             XCTAssertEqual(3, stream.startIndex)
             XCTAssertEqual(2, stream.count)
             XCTAssertEqual(2, stream.remainingCount)
             XCTAssertEqualHex([0x03, 0x04], [UInt8](stream.remainingData))
+            XCTAssertEqual(0x03, try stream.read() as UInt8)
+            XCTAssertEqual(0x04, try stream.read() as UInt8)
         }
     }
     

@@ -31,10 +31,10 @@ public struct DataStream {
         precondition(count >= 0)
         precondition(startIndex <= dataStream.count - count)
         
-        self.startIndex = dataStream._actualPosition + startIndex
+        self.startIndex = dataStream.startIndex + startIndex
         self.count = count
         self.data = dataStream.data
-        self._actualPosition = dataStream._actualPosition + startIndex
+        self._actualPosition = dataStream.startIndex + startIndex
     }
     
     public init(_ data: Data) {
