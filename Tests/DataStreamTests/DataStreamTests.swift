@@ -136,6 +136,80 @@ final class DataStreamTests: XCTestCase {
         }
     }
     
+    func testConstructorDataStreamSlice() {
+        do {
+            let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            let original = DataStream(data)
+            let stream = DataStream(slicing: original, startIndex: 0, count: 8)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(0, stream.startIndex)
+            XCTAssertEqual(8, stream.count)
+            XCTAssertEqual(8, stream.remainingCount)
+            XCTAssertEqualHex([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07], [UInt8](stream.remainingData))
+        }
+        do {
+            let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            let original = DataStream(data)
+            let stream = DataStream(slicing: original, startIndex: 0, count: 2)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(0, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(2, stream.remainingCount)
+            XCTAssertEqualHex([0x00, 0x01], [UInt8](stream.remainingData))
+        }
+        do {
+            let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            let original = DataStream(data)
+            let stream = DataStream(slicing: original, startIndex: 2, count: 3)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(2, stream.startIndex)
+            XCTAssertEqual(3, stream.count)
+            XCTAssertEqual(3, stream.remainingCount)
+            XCTAssertEqualHex([0x02, 0x03, 0x04], [UInt8](stream.remainingData))
+        }
+        do {
+            let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            let original = DataStream(data)
+            let stream = DataStream(slicing: original, startIndex: 4, count: 4)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(4, stream.startIndex)
+            XCTAssertEqual(4, stream.count)
+            XCTAssertEqual(4, stream.remainingCount)
+            XCTAssertEqualHex([0x04, 0x05, 0x06, 0x07], [UInt8](stream.remainingData))
+        }
+        do {
+            let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            let original = DataStream(data)
+            let stream = DataStream(slicing: original, startIndex: 8, count: 0)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(8, stream.startIndex)
+            XCTAssertEqual(0, stream.count)
+            XCTAssertEqual(0, stream.remainingCount)
+            XCTAssertEqualHex([], [UInt8](stream.remainingData))
+        }
+        do {
+            let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            let original = DataStream(data)
+            let stream = DataStream(slicing: original, startIndex: 7, count: 1)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(7, stream.startIndex)
+            XCTAssertEqual(1, stream.count)
+            XCTAssertEqual(1, stream.remainingCount)
+            XCTAssertEqualHex([0x07], [UInt8](stream.remainingData))
+        }
+        do {
+            let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+            let original = DataStream(data)
+            let slice = DataStream(slicing: original, startIndex: 2, count: 4)
+            let stream = DataStream(slicing: slice, startIndex: 1, count: 2)
+            XCTAssertEqual(0, stream.position)
+            XCTAssertEqual(3, stream.startIndex)
+            XCTAssertEqual(2, stream.count)
+            XCTAssertEqual(2, stream.remainingCount)
+            XCTAssertEqualHex([0x03, 0x04], [UInt8](stream.remainingData))
+        }
+    }
+    
     func testReadUInt8() throws {
         let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
         var stream = DataStream(data)
@@ -1208,6 +1282,8 @@ final class DataStreamTests: XCTestCase {
         ("testConstructorUInt8Array", testConstructorUInt8Array),
         ("testConstructorUInt8ArraySlice", testConstructorUInt8ArraySlice),
         ("testConstructorData", testConstructorData),
+        ("testConstructorDataSlice", testConstructorDataSlice),
+        ("testConstructorDataStreamSlice", testConstructorDataStreamSlice),
         ("testReadUInt8", testReadUInt8),
         ("testReadInt8", testReadInt8),
         ("testReadUInt16", testReadUInt16),
