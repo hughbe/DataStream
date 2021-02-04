@@ -267,4 +267,12 @@ public struct DataStream {
 
         data.copyBytes(to: pointer, from: data.startIndex + _actualPosition..<data.startIndex + _actualPosition + count)
     }
+    
+    public mutating func skip(count: Int) throws {
+        if _actualPosition + count > startIndex + self.count {
+            throw DataStreamError.noSpace(position: position, count: count)
+        }
+
+        position += count
+    }
 }

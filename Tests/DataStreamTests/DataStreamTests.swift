@@ -1340,6 +1340,24 @@ final class DataStreamTests: XCTestCase {
         XCTAssertEqual(0x07, try stream.read() as UInt8)
     }
     
+    func testSkip() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data)
+        
+        try stream.skip(count: 0)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        XCTAssertEqual(0x00, try stream.read() as UInt8)
+
+        try stream.skip(count: 1)
+        XCTAssertEqual(2, stream.position)
+        XCTAssertEqual(6, stream.remainingCount)
+        XCTAssertEqual(0x02, try stream.read() as UInt8)
+        
+        XCTAssertThrowsError(try stream.skip(count: 6))
+        XCTAssertThrowsError(try stream.skip(count: 7))
+    }
+    
     func testPerformance() throws {
         let buffer = [UInt8](repeating: 123, count: 500_000)
         measure(metrics: [XCTClockMetric(), XCTCPUMetric(), XCTMemoryMetric()]) {
@@ -1381,6 +1399,7 @@ final class DataStreamTests: XCTestCase {
         ("testReadBits", testReadBits),
         ("testReadSlice", testReadSlice),
         ("testPosition", testPosition),
+        ("testSkip", testSkip),
         ("testPerformance", testPerformance)
     ]
 }
