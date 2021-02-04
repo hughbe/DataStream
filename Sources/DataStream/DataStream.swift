@@ -75,7 +75,7 @@ public struct DataStream {
         }
     }
     
-    public mutating func peek<T>(endianess: Endianess = .systemDefault) throws -> T where T: FixedWidthInteger {
+    public func peek<T>(endianess: Endianess = .systemDefault) throws -> T where T: FixedWidthInteger {
         let value = try peek(type: T.self)
         switch endianess {
         case .systemDefault:
@@ -91,7 +91,7 @@ public struct DataStream {
         return BitFieldReader(rawValue: try read(endianess: endianess))
     }
     
-    public mutating func peekBits<T>(endianess: Endianess = .systemDefault) throws -> BitFieldReader<T> where T: FixedWidthInteger {
+    public func peekBits<T>(endianess: Endianess = .systemDefault) throws -> BitFieldReader<T> where T: FixedWidthInteger {
         return BitFieldReader(rawValue: try peek(endianess: endianess))
     }
     
@@ -107,7 +107,7 @@ public struct DataStream {
         }
     }
     
-    public mutating func peekFloat(endianess: Endianess = .systemDefault) throws -> Float {
+    public func peekFloat(endianess: Endianess = .systemDefault) throws -> Float {
         let value = try peek(type: Float.self)
         switch endianess {
         case .systemDefault:
@@ -131,7 +131,7 @@ public struct DataStream {
         }
     }
     
-    public mutating func peekDouble(endianess: Endianess = .systemDefault) throws -> Double {
+    public func peekDouble(endianess: Endianess = .systemDefault) throws -> Double {
         let value = try peek(type: Double.self)
         switch endianess {
         case .systemDefault:
@@ -151,7 +151,7 @@ public struct DataStream {
         return result
     }
     
-    public mutating func peekBytes(count: Int) throws -> [UInt8] {
+    public func peekBytes(count: Int) throws -> [UInt8] {
         var result = [UInt8](repeating: 0, count: count)
         try result.withUnsafeMutableBufferPointer {
             try peekBytes(to: $0, count: count)
@@ -164,7 +164,7 @@ public struct DataStream {
         return String(bytes: bytes, encoding: encoding)
     }
     
-    public mutating func peekString(count: Int, encoding: String.Encoding) throws -> String? {
+    public func peekString(count: Int, encoding: String.Encoding) throws -> String? {
         let bytes = try peekBytes(count: count)
         return String(bytes: bytes, encoding: encoding)
     }
@@ -227,7 +227,7 @@ public struct DataStream {
         return result
     }
     
-    public mutating func peek<T>(type: T.Type) throws -> T {
+    public func peek<T>(type: T.Type) throws -> T {
         let size = MemoryLayout<T>.size
         if _actualPosition + size > startIndex + count {
             throw DataStreamError.noSpace(position: position, count: size)
@@ -238,12 +238,26 @@ public struct DataStream {
         }!
     }
     
+    public mutating func readDataStream(count: Int) throws -> DataStream {
+        let result = try peekDataStream(count: count)
+        position += count
+        return result
+    }
+    
+    public func peekDataStream(count: Int) throws -> DataStream {
+        if _actualPosition + count > startIndex + self.count {
+            throw DataStreamError.noSpace(position: position, count: count)
+        }
+
+        return DataStream(data, startIndex: position, count: count)
+    }
+    
     public mutating func readBytes(to pointer: UnsafeMutableBufferPointer<UInt8>, count: Int) throws {
         try peekBytes(to: pointer, count: count)
         position += count
     }
     
-    public mutating func peekBytes(to pointer: UnsafeMutableBufferPointer<UInt8>, count: Int) throws {
+    public func peekBytes(to pointer: UnsafeMutableBufferPointer<UInt8>, count: Int) throws {
         if _actualPosition + count > startIndex + self.count {
             throw DataStreamError.noSpace(position: position, count: count)
         }

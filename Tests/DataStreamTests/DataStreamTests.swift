@@ -664,6 +664,53 @@ final class DataStreamTests: XCTestCase {
         XCTAssertThrowsError(try stream.readBytes(count: 1))
     }
     
+    func testReadDataStream() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data)
+        var result = try stream.readDataStream(count: 0)
+        XCTAssertEqual(0, result.position)
+        XCTAssertEqual(0, result.count)
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        result = try stream.readDataStream(count: 3)
+        XCTAssertEqual(0, result.position)
+        XCTAssertEqual(3, result.count)
+        XCTAssertEqual([0x00, 0x01, 0x02], try result.readBytes(count: 3))
+        XCTAssertEqual(3, stream.position)
+        XCTAssertEqual(5, stream.remainingCount)
+        
+        result = try stream.readDataStream(count: 3)
+        XCTAssertEqual(0, result.position)
+        XCTAssertEqual(3, result.count)
+        XCTAssertEqual([0x03, 0x04, 0x05], try result.readBytes(count: 3))
+        XCTAssertEqual(6, stream.position)
+        XCTAssertEqual(2, stream.remainingCount)
+        
+        result = try stream.readDataStream(count: 1)
+        XCTAssertEqual(0, result.position)
+        XCTAssertEqual(1, result.count)
+        XCTAssertEqual([0x06], try result.readBytes(count: 1))
+        XCTAssertEqual(7, stream.position)
+        XCTAssertEqual(1, stream.remainingCount)
+        
+        result = try stream.readDataStream(count: 1)
+        XCTAssertEqual(0, result.position)
+        XCTAssertEqual(1, result.count)
+        XCTAssertEqual([0x07], try result.readBytes(count: 1))
+        XCTAssertEqual(8, stream.position)
+        XCTAssertEqual(0, stream.remainingCount)
+        
+        result = try stream.readDataStream(count: 0)
+        XCTAssertEqual(0, result.position)
+        XCTAssertEqual(0, result.count)
+        XCTAssertEqual([], try result.readBytes(count: 0))
+        XCTAssertEqual(8, stream.position)
+        XCTAssertEqual(0, stream.remainingCount)
+        
+        XCTAssertThrowsError(try stream.readDataStream(count: 1))
+    }
+    
     func testReadString() throws {
         let data = Data([0x41, 0x42, 0x43, 0x41, 0x00, 0x42, 0x00, 0x43, 0x00])
         var stream = DataStream(data)
@@ -946,6 +993,29 @@ final class DataStreamTests: XCTestCase {
         
         stream.position = 8
         XCTAssertThrowsError(try stream.peekBytes(count: 1))
+    }
+    
+    func testPeekDataStream() throws {
+        let data = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07])
+        var stream = DataStream(data)
+
+        var result = try stream.peekDataStream(count: 0)
+        XCTAssertEqual([], try result.readBytes(count: 0))
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+
+        result = try stream.peekDataStream(count: 3)
+        XCTAssertEqual([0x00, 0x01, 0x02], try result.readBytes(count: 3))
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        result = try stream.peekDataStream(count: 3)
+        XCTAssertEqual([0x00, 0x01, 0x02], try result.readBytes(count: 3))
+        XCTAssertEqual(0, stream.position)
+        XCTAssertEqual(8, stream.remainingCount)
+        
+        stream.position = 8
+        XCTAssertThrowsError(try stream.peekDataStream(count: 1))
     }
     
     func testPeekString() throws {
@@ -1300,10 +1370,13 @@ final class DataStreamTests: XCTestCase {
         ("testReadAsciiString", testReadAsciiString),
         ("testReadUnicodeString", testReadUnicodeString),
         ("testReadBytes", testReadBytes),
+        ("testReadDataStream", testReadDataStream),
         ("testRead", testRead),
         ("testPeekString", testPeekString),
         ("testPeekAsciiString", testPeekAsciiString),
         ("testPeekUnicodeString", testPeekUnicodeString),
+        ("testPeekBytes", testPeekBytes),
+        ("testPeekDataStream", testPeekDataStream),
         ("testCopyBytes", testCopyBytes),
         ("testReadBits", testReadBits),
         ("testReadSlice", testReadSlice),
